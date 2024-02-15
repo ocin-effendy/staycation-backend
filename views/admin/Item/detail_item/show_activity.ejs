@@ -5,7 +5,7 @@
        <div class="card-body">
         <div class="row">
             <div class="col-md-5">
-                <form method="post" action="/admin/bank" enctype="multipart/form-data">
+                <form method="post" action="/admin/item/add/activity" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
                             <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name" required>
@@ -18,6 +18,7 @@
                             <label for="name" class="form-label">Image</label>
                             <input type="file" class="form-control" id="name" name="image" required>
                         </div>
+                        <input type="hidden" name="itemId" value="<%= itemId %>">
                         <button type="submit" class="btn btn-primary">save</button>
                 </form>
             </div>
@@ -34,8 +35,24 @@
                             </tr>
                         </thead>
                         <tbody>
-                       
-                     </tbody>
+                            <% for(let i = 0; i < activity.length; i++) { %>
+                            <tr>
+                                <td><%= i + 1 %></td>
+                                <td><%= activity[i].name %></td>
+                                <td><%= activity[i].type %></td>
+                                <td>
+                                    <img src="http://localhost:3000/<%= activity[i].imageUrl %>" alt="imageUrl" width="70px" >
+                                </td>
+        
+                                <td>
+                                    <form action="/admin/item/<%= itemId %>/activity/<%= activity[i].id %>?_method=DELETE" method="post">
+                                        <a href="javascript:void()" type="button" class="brn btn-warning btn-circle btn-sm button-update" data-id="<%= activity[i].id %>" data-name="<%= activity[i].name %>" data-type="<%= activity[i].type %>"><i class="fas fa-edit"></i></a>
+                                        <button type="submit" class="brn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
                     </table>
                 </div>
             </div>
