@@ -4,14 +4,70 @@ const Image = require('../models/Image');
 const Item = require('../models/Item');
 const Feature = require('../models/Feature');
 const Activity = require('../models/Activity');
+const Users = require('../models/Users');
 const fs = require('fs-extra');
 const path = require('path');
+const bcrypt = require('bcryptjs');
+
 
 module.exports = {
+    viewSignin: (req, res) => {
+        try{
+            const alertMessage = req.flash('alertMessage');
+            const alertStatus = req.flash('alertStatus');
+            const alert = {message: alertMessage, status: alertStatus};
+            if(req.session.user == null || req.session.user == undefined){
+                res.render('index', {
+                    alert,
+                    title: "Staycation | Signin"
+                });
+            }else{
+                res.redirect('/admin/dashboard');
+            }
+        }catch (err) {
+            res.redirect('/admin/signin');
+        }
+    },
+
+    actionSignin: async (req, res) => {
+        try {
+            const {username, password} = req.body;
+            const user = await Users.findOne({username: username});
+            if(!user){
+                req.flash('alertMessage', "User tidak ditemukan");
+                req.flash('alertStatus', "danger");
+                res.redirect('/admin/signin');
+            }else if(!bcrypt.compareSync(password, user.password)){
+                req.flash('alertMessage', "Password salah");
+                req.flash('alertStatus', "danger");
+                res.redirect('/admin/signin');
+            }else{
+                req.session.user = {
+                    id: user._id,
+                    username: user.username
+                }
+                res.redirect('/admin/dashboard');
+            }
+            
+        } catch (err) {
+            res.redirect('/admin/signin');
+        }
+    },
+
+    actionLogout: (req, res) => {
+        req.session.destroy();
+        res.redirect('/admin/signin');
+    },
+
     viewDashboard: (req, res) => {
-        res.render('admin/dashboard/view_dashboard', {
-            title: "Staycation | Dashboard"
-        });
+        try {
+            res.render('admin/dashboard/view_dashboard', {
+                title: "Staycation | Dashboard",
+                user: req.session.user
+            });
+        } catch (err) {
+            
+        }
     },
 
     // Category
@@ -24,7 +80,8 @@ module.exports = {
             res.render('admin/category/view_category', {
                 category,
                 alert,
-                title: "Staycation | Category"
+                title: "Staycation | Category",
+                user: req.session.user
             });
         }catch (err) {
             res.redirect('/admin/category');
@@ -87,7 +144,8 @@ module.exports = {
             res.render('admin/bank/view_bank', {
                 bank,
                 title: "Staycation | Bank",
-                alert
+                alert,
+                user: req.session.user
             });
         } catch (error) {
             req.flash('alertMessage',   `${err.message}`);
@@ -179,7 +237,8 @@ module.exports = {
                 category,
                 alert,
                 item,
-                action: "view"
+                action: "view",
+                user: req.session.user
             });
         } catch (err) {
             req.flash('alertMessage',   `${err.message}`);
@@ -232,7 +291,8 @@ module.exports = {
                 title: "Staycation | Show Image Item",
                 alert,
                 item,
-                action: "show image"
+                action: "show image",
+                user: req.session.user
             });
             
         } catch (err) {
@@ -352,7 +412,8 @@ module.exports = {
             alert,
             itemId,
             feature,
-            activity
+            activity,
+            user: req.session.user
         });
         
       } catch (err) {
@@ -533,7 +594,8 @@ module.exports = {
 
     viewBooking: (req, res) => {
         res.render('admin/booking/view_booking', {
-            title: "Staycation | Booking"
+            title: "Staycation | Booking",
+            user: req.session.user
         });
     },
 }

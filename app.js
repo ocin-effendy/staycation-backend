@@ -10,7 +10,7 @@ const flash = require('connect-flash');
 
 // mongoose
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/db_staycation');
+mongoose.connect('mongodb://127.0.0.1:27017/database_staycation');
 
 
 var indexRouter = require('./routes/index');
