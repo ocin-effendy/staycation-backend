@@ -56,7 +56,7 @@ const bookingSchema = new mongoose.Schema({
         },
         status: {
             type: String,
-            required: true
+            default: 'Process'
         },
         accountHolder: {
             type: String,
